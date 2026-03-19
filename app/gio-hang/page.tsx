@@ -3,150 +3,255 @@
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { SEO } from '@/src/components/common/SEO';
+
+interface CartItem {
+  id: number;
+  name: string;
+  price?: number;
+  image?: string;
+  quantity?: number;
+}
 
 export default function CartPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [note, setNote] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    const loadCart = () => {
+      if (typeof window === 'undefined') return;
+      const savedCart = localStorage.getItem('cart');
+      if (!savedCart) {
+        setCartItems([]);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(savedCart);
+        setCartItems(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setCartItems([]);
+      }
+    };
+
+    loadCart();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('cartUpdated', loadCart);
+      return () => window.removeEventListener('cartUpdated', loadCart);
     }
   }, []);
 
-  const removeItem = (id: number) => {
+  const persistCart = (items: CartItem[]) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('cart', JSON.stringify(items));
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+
+  const handleRemove = (id: number) => {
     const updated = cartItems.filter((item) => item.id !== id);
     setCartItems(updated);
-    localStorage.setItem('cart', JSON.stringify(updated));
-    window.dispatchEvent(new Event('cartUpdated'));
+    persistCart(updated);
   };
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
+  const handleQuantityChange = (id: number, qty: number) => {
+    if (qty <= 0) return;
     const updated = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
+      item.id === id ? { ...item, quantity: qty } : item
     );
     setCartItems(updated);
-    localStorage.setItem('cart', JSON.stringify(updated));
-    window.dispatchEvent(new Event('cartUpdated'));
+    persistCart(updated);
   };
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) =>
-      sum +
-      (typeof item.price === 'number' ? item.price * (item.quantity || 1) : 0),
-    0
-  );
+  const total = cartItems.reduce((sum, item) => {
+    const price = typeof item.price === 'number' ? item.price : 0;
+    const quantity = item.quantity && item.quantity > 0 ? item.quantity : 1;
+    return sum + price * quantity;
+  }, 0);
+
+  const handleSubmitQuote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cartItems.length) {
+      alert('Vui lòng thêm sản phẩm vào giỏ hàng');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      console.log('Quote request:', {
+        customerName,
+        phone,
+        email,
+        company,
+        note,
+        items: cartItems,
+        total,
+      });
+      alert('Gửi yêu cầu báo giá thành công! Chúng tôi sẽ liên hệ lại sớm nhất.');
+      setCustomerName('');
+      setPhone('');
+      setEmail('');
+      setCompany('');
+      setNote('');
+    } catch (error) {
+      console.error('Error submitting quote:', error);
+      alert('Gửi yêu cầu thất bại, vui lòng thử lại sau.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20 md:pt-32 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-6 font-medium hover:opacity-80 transition"
-        >
-          <ChevronLeft size={20} />
-          Quay lại
-        </button>
+    <div className="min-h-screen bg-white dark:bg-gray-950 pt-20 md:pt-40">
+      <SEO
+        title="Giỏ hàng"
+        description="Giỏ hàng & yêu cầu báo giá sản phẩm"
+        url="https://duy-gia-phat.vn/gio-hang"
+      />
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="mb-8">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-3 font-medium"
+          >
+            <ChevronLeft size={20} />
+            Quay lại
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Giỏ hàng</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Bạn có {cartItems.length} sản phẩm trong giỏ
+          </p>
+        </div>
 
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Giỏ hàng của bạn</h1>
-
-        {cartItems.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-12 text-center transition-colors">
-            <ShoppingCart size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-700" />
-            <p className="text-gray-600 dark:text-gray-400 mb-4 text-lg">Giỏ hàng của bạn trống</p>
-            <button
-              onClick={() => router.push('/san-pham')}
-              className="bg-amber-500 dark:bg-amber-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-amber-600 dark:hover:bg-amber-700 transition"
-            >
-              Tiếp tục mua hàng
-            </button>
-          </div>
-        ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow transition-colors">
-                {cartItems.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center gap-4 p-6 ${
-                      index !== cartItems.length - 1 ? 'border-b dark:border-gray-800' : ''
-                    }`}
-                  >
-                    <div className="w-32 h-32 bg-gray-200 dark:bg-gray-800 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors">
-                      {item.image ? (
-                        <img
-                          src={typeof item.image === 'string' ? item.image : item.image.src}
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="text-gray-400 dark:text-gray-600 text-center text-sm">Không có hình</div>
-                      )}
+        {cartItems.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+              {cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6 border-b border-gray-100 dark:border-gray-800 last:border-b-0"
+                >
+                  {item.image && (
+                    <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{item.name}</h3>
-                      <p className="text-amber-600 dark:text-amber-400 font-bold text-lg">
-                        {typeof item.price === 'number'
-                          ? `${item.price.toLocaleString('vi-VN')} đ`
-                          : 'Liên hệ'}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{item.category}</p>
-                    </div>
-                    <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg transition-colors">
+                  )}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{item.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Mã: DGP-{String(item.id).padStart(3, '0')}
+                    </p>
+                    <p className="text-amber-600 dark:text-amber-400 font-bold mt-1">
+                      {typeof item.price === 'number'
+                        ? `${item.price.toLocaleString()}đ`
+                        : 'Liên hệ'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                       <button
-                        onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
-                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition"
+                        onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1)}
+                        className="p-1 disabled:opacity-50"
+                        disabled={(item.quantity || 1) <= 1}
                       >
-                        <Minus size={18} />
+                        <Minus size={16} />
                       </button>
-                      <span className="font-bold min-w-[30px] text-center">{item.quantity || 1}</span>
+                      <span className="w-8 text-center text-sm">{item.quantity || 1}</span>
                       <button
-                        onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
-                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition"
+                        onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
+                        className="p-1"
                       >
-                        <Plus size={18} />
+                        <Plus size={16} />
                       </button>
                     </div>
                     <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 p-2 rounded transition"
+                      onClick={() => handleRemove(item.id)}
+                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded"
                     >
-                      <Trash2 size={20} />
+                      <Trash2 size={18} />
                     </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
 
-            <div>
-              <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow sticky top-24 transition-colors">
-                <h3 className="font-bold text-lg mb-6 text-gray-900 dark:text-white">Tóm tắt đơn hàng</h3>
-                <div className="space-y-3 mb-6 pb-6 border-b dark:border-gray-800">
-                  <div className="flex justify-between text-gray-900 dark:text-gray-100">
-                    <span className="text-gray-600 dark:text-gray-400">Số sản phẩm:</span>
-                    <span className="font-bold">{cartItems.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Tổng tiền:</span>
-                    <span className="font-bold text-amber-600 dark:text-amber-400">
-                      {totalPrice.toLocaleString('vi-VN')} đ
-                    </span>
-                  </div>
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 h-fit">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Yêu cầu báo giá</h3>
+              <div className="space-y-2 pb-4 border-b border-gray-200 dark:border-gray-700 text-sm mb-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Tạm tính:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    {total.toLocaleString()}đ
+                  </span>
                 </div>
-                <button className="w-full bg-amber-500 dark:bg-amber-600 text-white py-3 rounded-lg font-bold hover:bg-amber-600 dark:hover:bg-amber-700 flex items-center justify-center gap-2 transition mb-3">
-                  <ShoppingCart size={20} />
-                  Thanh toán
-                </button>
-                <button
-                  onClick={() => router.push('/san-pham')}
-                  className="w-full border-2 border-amber-500 dark:border-amber-600 text-amber-600 dark:text-amber-400 py-3 rounded-lg font-bold hover:bg-amber-50 dark:hover:bg-amber-950/30 transition"
-                >
-                  Tiếp tục mua hàng
-                </button>
               </div>
+              <form onSubmit={handleSubmitQuote} className="space-y-3 text-sm">
+                <input
+                  type="text"
+                  placeholder="Họ và tên"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+                <input
+                  type="tel"
+                  placeholder="Số điện thoại"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+                <input
+                  type="email"
+                  placeholder="Email (nếu có)"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+                <input
+                  type="text"
+                  placeholder="Công ty / đơn vị"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+                <textarea
+                  placeholder="Ghi chú thêm về yêu cầu"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white font-bold py-2.5 rounded disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={20} />
+                  {submitting ? 'Đang gửi yêu cầu...' : 'Gửi yêu cầu báo giá'}
+                </button>
+              </form>
             </div>
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-12 text-center">
+            <ShoppingCart size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-700" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Giỏ hàng trống</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Bạn chưa thêm sản phẩm nào vào giỏ hàng
+            </p>
+            <button
+              onClick={() => router.push('/san-pham')}
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white px-8 py-3 rounded font-bold"
+            >
+              <ShoppingCart size={20} />
+              Khám phá sản phẩm
+            </button>
           </div>
         )}
       </div>

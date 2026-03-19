@@ -20,6 +20,13 @@ import AMB_headerbanner from '@/src/assets/AMB_headerbanner.jpg';
 import { CategoryIcon } from '@/src/components/common/CategoryIcons';
 import { SEO } from '@/src/components/common/SEO';
 
+// Helper function to safely get image URL from imports
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function Home() {
   const router = useRouter();
 
@@ -369,7 +376,7 @@ export default function Home() {
             >
               <div className="relative aspect-square overflow-hidden bg-slate-100 flex-shrink-0">
                 <img
-                  src={product.image}
+                  src={getImageUrl(product.image)}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
@@ -489,6 +496,45 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Statistics Section */}
+      <section className="bg-white py-16 sm:py-20 md:py-24">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {/* Dự án hoàn thành */}
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 hover:border-amber-300 hover:shadow-lg transition-all text-center group">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-600 group-hover:scale-110 transition-transform mb-2">
+                156+
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base font-medium">Dự án hoàn thành</p>
+            </div>
+
+            {/* Khách hàng tin tưởng */}
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 hover:border-amber-300 hover:shadow-lg transition-all text-center group">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-600 group-hover:scale-110 transition-transform mb-2">
+                45+
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base font-medium">Khách hàng tin tưởng</p>
+            </div>
+
+            {/* Năm kinh nghiệm */}
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 hover:border-amber-300 hover:shadow-lg transition-all text-center group">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-600 group-hover:scale-110 transition-transform mb-2">
+                15+
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base font-medium">Năm kinh nghiệm</p>
+            </div>
+
+            {/* Công nhân kỹ thuật */}
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 hover:border-amber-300 hover:shadow-lg transition-all text-center group">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-600 group-hover:scale-110 transition-transform mb-2">
+                200+
+              </div>
+              <p className="text-slate-600 text-sm sm:text-base font-medium">Công nhân kỹ thuật</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Partner Brands Section */}
       <section className="bg-slate-900/5 py-20">
         <div className="max-w-7xl mx-auto px-4">
@@ -536,8 +582,18 @@ export default function Home() {
             >
               {/* Background Image */}
               <div className="absolute inset-0 w-full h-full">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900 z-10"></div>
-                <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                {getImageUrl(project.image) ? (
+                  <img
+                    src={getImageUrl(project.image)}
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : null}
+                <div className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900 z-10 ${getImageUrl(project.image) ? '' : 'to-slate-900'}`}></div>
+                <div className={`${getImageUrl(project.image) ? 'hidden' : 'absolute'} inset-0 w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center`}>
                   <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-500">
                     🏭
                   </div>
@@ -596,7 +652,7 @@ export default function Home() {
               {/* Article Image */}
               <div className="aspect-video overflow-hidden bg-slate-100">
                 <img
-                  src={article.image}
+                  src={getImageUrl(article.image)}
                   alt={article.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />

@@ -1,6 +1,13 @@
 import { Phone, Mail, MapPin, Facebook } from 'lucide-react';
 import logo from '@/src/assets/logo.png';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 const ZaloIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +30,7 @@ export default function Footer() {
           <div>
             <div className="mb-6">
               <img
-                src={logo.src}
+                src={getImageUrl(logo)}
                 alt="Duy Gia Phát Logo"
                 className="h-24 w-auto object-contain"
               />

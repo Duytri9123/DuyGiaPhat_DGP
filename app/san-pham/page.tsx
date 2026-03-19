@@ -7,8 +7,16 @@ import { useState, useMemo, Suspense } from 'react';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import AMB_headerbanner from '@/src/assets/AMB_headerbanner.jpg';
 import { SEO } from '@/src/components/common/SEO';
+import ProductCard from '@/src/components/common/ProductCard';
 
 type SortOption = 'name' | 'rating-desc' | 'rating-asc' | 'sales-desc' | 'sales-asc' | 'stock';
+
+// Helper function to safely get image URL from imports
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
 
 function ProductsContent() {
   const router = useRouter();
@@ -408,28 +416,11 @@ function ProductsContent() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredProducts.map((product) => (
-                <div
+                <ProductCard
                   key={product.id}
+                  product={product}
                   onClick={() => router.push(`/san-pham/${product.id}`)}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer overflow-hidden group"
-                >
-                  <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold line-clamp-2">{product.name}</h3>
-                    <p className="text-amber-600 font-bold text-lg mt-2">Liên hệ</p>
-                    <div className="flex items-center justify-between mt-4">
-                      <span className="text-sm text-gray-600">
-                        ⭐ {product.rating} ({product.sales} đã bán)
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                />
               ))}
             </div>
           )}

@@ -4,6 +4,13 @@ import { mockNews } from '@/src/data/mockData';
 import { CalendarDays, ChevronRight, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function NewsPage() {
   const router = useRouter();
   const article = mockNews[0];
@@ -36,8 +43,19 @@ export default function NewsPage() {
                 onClick={() => router.push(`/tin-tuc/${article.id}`)}
                 className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden cursor-pointer"
               >
-                <div className="flex flex-col md:flex-row md:h-64">
-                  <div className="md:w-80 h-48 md:h-auto flex-shrink-0 bg-slate-200 dark:bg-slate-700">
+                <div className="flex flex-col md:flex-row">
+                  <div className="md:w-80 h-48 md:h-64 flex-shrink-0 bg-slate-200 dark:bg-slate-700 overflow-hidden group">
+                    {getImageUrl(article.image) ? (
+                      <img
+                        src={getImageUrl(article.image)}
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
                     <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-6xl">
                       📰
                     </div>
@@ -58,7 +76,7 @@ export default function NewsPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Eye size={16} className="text-amber-500" />
-                        <span>{article.views || 0} lượt xem</span>
+                        <span>{(article.views || 0).toLocaleString('vi-VN')} lượt xem</span>
                       </div>
                     </div>
                   </div>
@@ -74,9 +92,19 @@ export default function NewsPage() {
                   onClick={() => router.push(`/tin-tuc/${item.id}`)}
                   className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden cursor-pointer"
                 >
-                  <div className="flex flex-col sm:flex-row sm:h-40">
-                    <div className="sm:w-48 h-32 sm:h-auto flex-shrink-0 bg-slate-200 dark:bg-slate-700">
-                      <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-4xl">
+                  <div className="flex flex-col sm:flex-row">
+                    <div className="sm:w-48 h-32 sm:h-40 flex-shrink-0 bg-slate-200 dark:bg-slate-700 overflow-hidden group relative">
+                      {getImageUrl(item.image) ? (
+                        <img
+                          src={getImageUrl(item.image)}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`absolute inset-0 ${getImageUrl(item.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-4xl`}>
                         📰
                       </div>
                     </div>
@@ -96,7 +124,7 @@ export default function NewsPage() {
                         </div>
                         <div className="flex items-center gap-1">
                           <Eye size={14} className="text-amber-500" />
-                          <span>{item.views || 0} lượt xem</span>
+                          <span>{(item.views || 0).toLocaleString('vi-VN')} lượt xem</span>
                         </div>
                       </div>
                     </div>
@@ -121,8 +149,18 @@ export default function NewsPage() {
                     onClick={() => router.push(`/tin-tuc/${item.id}`)}
                     className="flex gap-4 group cursor-pointer text-left w-full"
                   >
-                    <div className="w-20 h-20 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden shrink-0">
-                      <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-2xl">
+                    <div className="w-20 h-20 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden shrink-0 relative">
+                      {getImageUrl(item.image) ? (
+                        <img
+                          src={getImageUrl(item.image)}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`absolute inset-0 ${getImageUrl(item.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-2xl`}>
                         📰
                       </div>
                     </div>

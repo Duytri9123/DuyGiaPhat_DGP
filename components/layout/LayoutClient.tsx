@@ -8,6 +8,14 @@ import Footer from './Footer';
 import { useTheme } from '@/components/ThemeProvider';
 import zaloIcon from '@/src/assets/icons8-zalo.svg';
 
+// Helper function to extract SVG URL
+const getSvgUrl = (svg: any): string => {
+  if (typeof svg === 'string' && svg) return svg;
+  if (svg?.src && typeof svg.src === 'string') return svg.src;
+  if (svg?.default?.src && typeof svg.default.src === 'string') return svg.default.src;
+  return '';
+};
+
 export default function LayoutClient({
   children,
 }: {
@@ -121,7 +129,9 @@ export default function LayoutClient({
         <div className="relative">
           {/* Nút chính */}
           <div className="transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
-            <img src={zaloIcon} alt="Zalo" className="w-16 h-16" />
+            <img src={getSvgUrl(zaloIcon)} alt="Zalo" className="w-16 h-16" onError={(e) => {
+              (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M12.49 10.272v-.45h1.347v6.322h-.77a.576.576 0 0 1-.577-.573v.001a3.27 3.27 0 0 1-1.938.632a3.284 3.284 0 0 1-3.284-3.282a3.284 3.284 0 0 1 3.284-3.282a3.27 3.27 0 0 1 1.937.632zM6.919 7.79v.205c0 .382-.051.694-.3 1.06l-.03.034a8 8 0 0 0-.242.285L2.024 14.8h4.895v.768a.576.576 0 0 1-.577.576H0v-.362c0-.443.11-.641.25-.847L4.858 9.23H.192V7.79zm8.551 8.354a.48.48 0 0 1-.48-.48V7.79h1.441v8.354zM20.693 9.6a3.306 3.306 0 1 1 .002 6.612a3.306 3.306 0 0 1-.002-6.612m-10.14 5.253a1.932 1.932 0 1 0 0-3.863a1.932 1.932 0 0 0 0 3.863m10.14-.003a1.945 1.945 0 1 0 0-3.89a1.945 1.945 0 0 0 0 3.89"/%3E%3C/svg%3E';
+            }} />
           </div>
 
           {/* Tooltip khi hover (chỉ trên desktop) */}

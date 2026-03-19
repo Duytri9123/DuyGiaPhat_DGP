@@ -4,6 +4,13 @@ import { mockProjects } from '@/src/data/mockData';
 import { MapPin, CheckCircle, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function Projects() {
   const router = useRouter();
 
@@ -28,8 +35,19 @@ export default function Projects() {
               onClick={() => router.push(`/du-an/${project.id}`)}
             >
               {/* Image */}
-              <div className="relative aspect-video overflow-hidden bg-gray-200">
-                <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center text-4xl">
+              <div className="relative aspect-video overflow-hidden bg-gray-200 group">
+                {getImageUrl(project.image) ? (
+                  <img
+                    src={getImageUrl(project.image)}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <div className={`absolute inset-0 ${getImageUrl(project.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform`}>
                   🏭
                 </div>
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all"></div>

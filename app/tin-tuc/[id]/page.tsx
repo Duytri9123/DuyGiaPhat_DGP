@@ -4,6 +4,13 @@ import { useRouter, useParams } from 'next/navigation';
 import { ChevronLeft, CalendarDays, Eye } from 'lucide-react';
 import { mockNews } from '@/src/data/mockData';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function NewsDetail() {
   const router = useRouter();
   const params = useParams();
@@ -77,8 +84,19 @@ export default function NewsDetail() {
               </header>
 
               {/* Hero image */}
-              <div className="mb-8 aspect-video w-full bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden group">
-                <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-7xl group-hover:scale-105 transition-transform duration-500">
+              <div className="mb-8 aspect-video w-full bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden group relative">
+                {getImageUrl(article.image) ? (
+                  <img
+                    src={getImageUrl(article.image)}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <div className={`absolute inset-0 ${getImageUrl(article.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-7xl group-hover:scale-105 transition-transform duration-500`}>
                   📰
                 </div>
               </div>
@@ -130,8 +148,18 @@ export default function NewsDetail() {
                       onClick={() => router.push(`/tin-tuc/${item.id}`)}
                       className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden group cursor-pointer text-left"
                     >
-                      <div className="aspect-video bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                        <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                      <div className="aspect-video bg-slate-200 dark:bg-slate-700 overflow-hidden relative">
+                        {getImageUrl(item.image) ? (
+                          <img
+                            src={getImageUrl(item.image)}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : null}
+                        <div className={`absolute inset-0 ${getImageUrl(item.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform`}>
                           📰
                         </div>
                       </div>
@@ -165,8 +193,18 @@ export default function NewsDetail() {
                     onClick={() => router.push(`/tin-tuc/${item.id}`)}
                     className="flex gap-4 group cursor-pointer text-left w-full"
                   >
-                    <div className="w-20 h-20 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden shrink-0">
-                      <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-2xl">
+                    <div className="w-20 h-20 bg-slate-200 dark:bg-slate-700 rounded overflow-hidden shrink-0 relative">
+                      {getImageUrl(item.image) ? (
+                        <img
+                          src={getImageUrl(item.image)}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`absolute inset-0 ${getImageUrl(item.image) ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-900 dark:to-amber-800 flex items-center justify-center text-2xl`}>
                         📰
                       </div>
                     </div>

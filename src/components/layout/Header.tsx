@@ -7,6 +7,13 @@ import Link from 'next/link';
 import { mockProducts } from '../../data/mockData';
 import logo from '../../assets/logo.png';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function Header() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,7 +84,7 @@ export default function Header() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <img src={logo.src} alt="Duy Gia Phát" className="h-12 w-auto" />
+            <img src={getImageUrl(logo)} alt="Duy Gia Phát" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Search */}

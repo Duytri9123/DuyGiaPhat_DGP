@@ -16,6 +16,13 @@ import {
 import { mockProducts } from '@/src/data/mockData';
 import logo from '@/src/assets/logo.png';
 
+// Helper function
+const getImageUrl = (img: any): string => {
+  if (typeof img === 'string' && img) return img;
+  if (img?.src && typeof img.src === 'string') return img.src;
+  return '';
+};
+
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showMobileSearchBar, setShowMobileSearchBar] = useState(false);
@@ -191,7 +198,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="shrink-0">
               <img
-                src={logo.src}
+                src={getImageUrl(logo)}
                 alt="Duy Gia Phát Logo"
                 className="h-12 sm:h-16 md:h-18 w-auto hover:scale-105 transition-transform"
               />

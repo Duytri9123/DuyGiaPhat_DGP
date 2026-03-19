@@ -22,27 +22,37 @@ import ngaTuThangCap from './products/nga-tu-thang-cap.jpg';
 import cutVuong90DoMangCap from './products/cut-vuong-90-do-mang-cap.jpg';
 import keDungBinhChuaChay from './products/ke-dung-binh-chua-chay.jpg';
 
+// Helper function to extract image path from import (handles both string and object returns)
+const getImagePath = (img: any): string => {
+  if (typeof img === 'string') return img;
+  if (img?.src) return img.src;
+  if (img?.default?.src) return img.default.src;
+  if (img?.default) return img.default;
+  console.warn('Image import format not recognized:', img);
+  return '';
+};
+
 const images = {
-  tuTram,
-  tuDieuKhienBms,
-  tuCongTo,
-  tuDieuKhienDongCoKhoiDongTruc,
-  tuDieuKhienDongCo2Cap,
-  tuDieuKhienDongCo,
-  tuDieuKhienPlc,
-  tuAts,
-  tuCuuHoa,
-  tuPhongChayChuaChay,
-  voTuTrongNhaVaNgoaiTroi,
-  mangCap,
-  coLenThangCap,
-  coXuongMangCap,
-  ngaBaMangCap,
-  ngaBaThangCap,
-  ngaTuMangCap,
-  ngaTuThangCap,
-  cutVuong90DoMangCap,
-  keDungBinhChuaChay,
+  tuTram: getImagePath(tuTram),
+  tuDieuKhienBms: getImagePath(tuDieuKhienBms),
+  tuCongTo: getImagePath(tuCongTo),
+  tuDieuKhienDongCoKhoiDongTruc: getImagePath(tuDieuKhienDongCoKhoiDongTruc),
+  tuDieuKhienDongCo2Cap: getImagePath(tuDieuKhienDongCo2Cap),
+  tuDieuKhienDongCo: getImagePath(tuDieuKhienDongCo),
+  tuDieuKhienPlc: getImagePath(tuDieuKhienPlc),
+  tuAts: getImagePath(tuAts),
+  tuCuuHoa: getImagePath(tuCuuHoa),
+  tuPhongChayChuaChay: getImagePath(tuPhongChayChuaChay),
+  voTuTrongNhaVaNgoaiTroi: getImagePath(voTuTrongNhaVaNgoaiTroi),
+  mangCap: getImagePath(mangCap),
+  coLenThangCap: getImagePath(coLenThangCap),
+  coXuongMangCap: getImagePath(coXuongMangCap),
+  ngaBaMangCap: getImagePath(ngaBaMangCap),
+  ngaBaThangCap: getImagePath(ngaBaThangCap),
+  ngaTuMangCap: getImagePath(ngaTuMangCap),
+  ngaTuThangCap: getImagePath(ngaTuThangCap),
+  cutVuong90DoMangCap: getImagePath(cutVuong90DoMangCap),
+  keDungBinhChuaChay: getImagePath(keDungBinhChuaChay),
 };
 
 export default images;

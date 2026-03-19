@@ -22,7 +22,15 @@ export default function ProductCard({
   const fallbackImage =
     'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=400&fit=crop';
 
-  const displayImage = imageError ? fallbackImage : product.image;
+  // Ensure image is always a string (handle object imports)
+  const getImageUrl = (img: any): string => {
+    if (typeof img === 'string' && img) return img;
+    if (img?.src && typeof img.src === 'string') return img.src;
+    if (img?.default?.src && typeof img.default.src === 'string') return img.default.src;
+    return fallbackImage;
+  };
+
+  const displayImage = imageError ? fallbackImage : getImageUrl(product.image);
 
   // Kiểm tra sản phẩm có trong wishlist không
   useEffect(() => {
