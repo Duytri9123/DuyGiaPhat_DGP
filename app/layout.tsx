@@ -23,6 +23,9 @@ const notoSans = Noto_Sans({
 export const metadata: Metadata = {
   title: "Duy Gia Phát - Thiết bị điện công nghiệp",
   description: "Chuyên cung cấp thiết bị điện công nghiệp và giải pháp tự động hóa",
+  other: {
+    "google-site-verification": "x1iqUdd04KL6Z1RkniAFZgpg0dWjy_Jlel9MyptpQUg",
+  },
 };
 
 export default function RootLayout({
